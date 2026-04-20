@@ -1,0 +1,3 @@
+[submodule "nginx/html"]
+	path = nginx/html
+	url = git@github.com:Aeriles-git/website.git
