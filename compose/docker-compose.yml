@@ -1,0 +1,34 @@
+services:
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    volumes:
+      - ../nginx/conf.d:/etc/nginx/conf.d:ro
+      - ../nginx/html:/usr/share/nginx/html:ro
+      - ../nginx/certs:/etc/nginx/certs:ro
+    networks:
+      - web
+
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:latest
+    container_name: cloudflare-ddns
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - CLOUDFLARE_API_TOKEN_FILE=/run/secrets/cf_token
+      - DOMAINS=aeriles.me,www.aeriles.me
+      - PROXIED=true
+      - IP6_PROVIDER=cloudflare.trace
+    secrets:
+      - cf_token
+
+secrets:
+  cf_token:
+    file: ../secrets/cloudflare-token.txt
+
+networks:
+  web:
+    driver: bridge
